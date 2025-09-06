@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creador de Sagas Pixeladas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+      body {
+        font-family: 'VT323', monospace;
+        font-size: 1.35rem;
+        background-color: #2c1d10;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAZKADAAQAAAABAAAAZAAAAAAnuRBNAAAATElEQVR42u3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBPAA0IAAH4bsWeAAAAAElFTkSuQmCC'), 
+                          linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                          url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAABGElEQVRYCe1VwQ7CMAy8p/9/dgd3U4eThsQGAw1JSSRI01Jb955zAhj+p258/A7g5S8gP8n556GAwDLy6yAfg7wM8hHIV/5fA4QjrwJchP4Esh/Io5D/rQBGEF8BfoL8BvgK8hzkP/k/gBGEJ4CvoJ4A9sL5D/InJ0A9AxBBPAGsBPAE8BKgHsBNAC8BewKMAHYCWAfwGMAVgCvAMgDXASwDWAawCWAPwFGA4wAnAc4BnAQ4D3AcwJGAowBHAY4CHAU4CnAU4DiAMwFnAM4BnAU4B3AOYEXAKsBKgFWAtQCrAVYCrAFYDbANwDbANgDbAGwDsA3ANgCbAGwCsAnAJgCbAGwCsAnAJoB/A/gD4D/4B+A/AP8B/AGQv4D8G3wL5LcA8vs/AP8F8t8B+S3Ifwcg/wT5T5D/BHlOAAAAAElFTkSuQmCC');
+        color: #f2e9e4;
+        image-rendering: pixelated;
+      }
+      h1, h2, h3, .font-press-start {
+        font-family: 'Press Start 2P', cursive;
+        text-shadow: 2px 2px #2c1d10;
+      }
+       
+      .nes-style-btn {
+        font-family: 'Press Start 2P', cursive;
+        background-color: transparent;
+        color: #f2e9e4;
+        border: 4px solid #444444;
+        padding: 1rem 1.5rem;
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-shadow: 2px 2px #000;
+      }
+      .nes-style-btn::before {
+        content: '';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        bottom: 4px;
+        border: 2px solid #f2e9e4;
+        z-index: 0;
+      }
+      .nes-style-btn:hover {
+        background-color: #c84c0c;
+        color: #FFD700;
+        text-shadow: 1px 1px #000, 0 0 12px #FFD700;
+        box-shadow: 0 0 18px rgba(255, 215, 0, 0.8);
+        transform: translateY(-2px);
+      }
+      .nes-style-btn:disabled {
+        color: #666;
+        background-color: transparent;
+        cursor: not-allowed;
+      }
+      .nes-style-btn:disabled::before {
+        border-color: #666;
+      }
+
+      .perspective-container {
+        perspective: 1500px;
+      }
+
+      .book-cover {
+        transform-style: preserve-3d;
+        transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+        transform-origin: left center;
+      }
+
+      .book-cover-opening {
+        transform: rotateY(-140deg);
+      }
+      
+      @keyframes slide-in-from-right {
+        from { transform: translateX(50px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      @keyframes slide-in-from-left {
+        from { transform: translateX(-50px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      .page-slide-in-next {
+        animation: slide-in-from-right 0.5s ease-out forwards;
+      }
+      .page-slide-in-prev {
+        animation: slide-in-from-left 0.5s ease-out forwards;
+      }
+
+      @keyframes move-particles {
+        0% { background-position: 0 0; }
+        100% { background-position: -500px -1000px; }
+      }
+
+      .magic-dust-effect {
+        position: relative;
+      }
+
+      .magic-dust-effect::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 1px, transparent 1px),
+                          radial-gradient(circle at 80% 30%, rgba(255, 215, 0, 0.1) 1px, transparent 1px),
+                          radial-gradient(circle at 50% 70%, rgba(255, 215, 0, 0.2) 2px, transparent 2px),
+                          radial-gradient(circle at 10% 90%, rgba(255, 215, 0, 0.1) 1px, transparent 1px);
+        background-size: 500px 500px;
+        pointer-events: none;
+        animation: move-particles 60s linear infinite;
+        opacity: 0.7;
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.17.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
